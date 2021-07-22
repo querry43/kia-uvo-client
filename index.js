@@ -23,54 +23,42 @@ axiosCookieJarSupport(axios)
       jar: this.cookieJar
     }
 
-    return new Promise((resolve, reject) =>
-      axios.post(
-        'https://owners.kia.com/apps/services/owners/apiGateway',
-        data,
-        config
-      )
-        .then(res => resolve(res.data.payload))
-        .catch(reject)
-      )
+    return axios.post(
+      'https://owners.kia.com/apps/services/owners/apiGateway',
+      data,
+      config
+    ).then(res => res.data.payload)
   }
 
   refreshVehicleStatus({vehicleKey}) {
-    return new Promise((resolve, reject) =>
-      axios.get(
-        'https://owners.kia.com/apps/services/owners/overviewvehicledata',
-        {
-          params: {
-            requestJson: {
-              action: 'ACTION_GET_LAST_REFRESHED_STATUS_FULL_LOOP'
-            }
-          },
-          jar: this.cookieJar,
-          withCredentials: true,
-          headers: {
-            vinkey: vehicleKey
+    return axios.get(
+      'https://owners.kia.com/apps/services/owners/overviewvehicledata',
+      {
+        params: {
+          requestJson: {
+            action: 'ACTION_GET_LAST_REFRESHED_STATUS_FULL_LOOP'
           }
+        },
+        jar: this.cookieJar,
+        withCredentials: true,
+        headers: {
+          vinkey: vehicleKey
         }
-      )
-        .then(res => resolve({vehicleKey}))
-        .catch(reject)
-    )
+      }
+    ).then(res => ({vehicleKey}))
   }
 
   getVehicleStatus({vehicleKey}) {
-    return new Promise((resolve, reject) =>
-      axios.get(
-        'https://owners.kia.com/apps/services/owners/getvehicleinfo.html/vehicleFeature/1/vehicleStatus/1/enrollment/1/maintenance/1/dtc/1',
-        {
-          jar: this.cookieJar,
-          withCredentials: true,
-          headers: {
-            vinkey: vehicleKey
-          }
+    return axios.get(
+      'https://owners.kia.com/apps/services/owners/getvehicleinfo.html/vehicleFeature/1/vehicleStatus/1/enrollment/1/maintenance/1/dtc/1',
+      {
+        jar: this.cookieJar,
+        withCredentials: true,
+        headers: {
+          vinkey: vehicleKey
         }
-      )
-        .then(res => resolve(res.data.payload))
-        .catch(reject)
-    )
+      }
+    ).then(res => res.data.payload)
   }
 }
 
