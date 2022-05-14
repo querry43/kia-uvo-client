@@ -1,12 +1,11 @@
 const axios = require('axios')
-const axiosCookieJarSupport = require('axios-cookiejar-support').default
-const tough = require('tough-cookie')
+const axiosCookieJarSupport = require('axios-cookiejar-support').wrapper
+const { CookieJar } = require('tough-cookie')
 
-axiosCookieJarSupport(axios)
-
- class UvoClient {
+class UvoClient {
   constructor() {
-    this.cookieJar = new tough.CookieJar()
+    this.cookieJar = new CookieJar()
+    this.client = axiosCookieJarSupport(axios.create({ jar: this.cookieJar }))
   }
 
   authenticate({userId, password}) {
@@ -19,11 +18,10 @@ axiosCookieJarSupport(axios)
     const config = {
       headers: {
         'content-type': 'application/x-www-form-urlencoded'
-      },
-      jar: this.cookieJar
+      }
     }
 
-    return axios.post(
+    return this.client.post(
       'https://owners.kia.com/apps/services/owners/apiGateway',
       data,
       config
@@ -31,7 +29,7 @@ axiosCookieJarSupport(axios)
   }
 
   refreshVehicleStatus({vehicleKey}) {
-    return axios.get(
+    return this.client.get(
       'https://owners.kia.com/apps/services/owners/overviewvehicledata',
       {
         params: {
@@ -39,8 +37,6 @@ axiosCookieJarSupport(axios)
             action: 'ACTION_GET_LAST_REFRESHED_STATUS_FULL_LOOP'
           }
         },
-        jar: this.cookieJar,
-        withCredentials: true,
         headers: {
           vinkey: vehicleKey
         }
@@ -49,11 +45,9 @@ axiosCookieJarSupport(axios)
   }
 
   getVehicleStatus({vehicleKey}) {
-    return axios.get(
+    return this.client.get(
       'https://owners.kia.com/apps/services/owners/getvehicleinfo.html/vehicleFeature/1/vehicleStatus/1/enrollment/1/maintenance/1/dtc/1',
       {
-        jar: this.cookieJar,
-        withCredentials: true,
         headers: {
           vinkey: vehicleKey
         }

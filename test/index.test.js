@@ -30,19 +30,14 @@ const respondToAuthentication = () => {
     }
   }
 
-  const replyHeaders = {
-    'Set-Cookie': 'JSESSIONID=123'
-  }
-
   nock('https://owners.kia.com', { reqheaders: expectedHeaders })
     .post('/apps/services/owners/apiGateway', matches(expectedParams))
-    .reply(200, reply, replyHeaders)
+    .reply(200, reply)
 }
 
 const respondToRefreshVehicleStatus = () => {
   const expectedHeaders = {
     vinkey: 123,
-    cookie: 'JSESSIONID=123'
   }
 
   const expectedParams = {
@@ -67,7 +62,6 @@ const respondToRefreshVehicleStatus = () => {
 const respondToVehicleStatus = () => {
   const expectedHeaders = {
     vinkey: 123,
-    cookie: 'JSESSIONID=123'
   }
 
   const reply = {
@@ -101,9 +95,6 @@ describe('UvoClient', () => {
     const data = await client.authenticate({userId: 'foo', password: 'bar'})
 
     expect(data.vehicleSummary[0].vehicleKey).to.equal(123)
-
-    const cookie = await client.cookieJar.getCookieString('https://owners.kia.com/', {allPaths: true})
-    expect(cookie).to.equal('JSESSIONID=123')
   })
 
   it('should refresh vehicle status', async () => {
